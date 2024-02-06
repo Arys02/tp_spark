@@ -11,14 +11,11 @@ def main():
     csv_file = "src/resources/exo1/data.csv"
     output = "data/exo1/output"
 
-    # Création d'un DataFrame à partir d'un fichier CSV
     df = spark.read.csv(csv_file, header=True)
-
     w = wordcount(df, "text")
-    w.show()
 
     wordwrite(w, output)
-    print("Hello world!")
+
 
 
 def wordcount(df, col_name):
