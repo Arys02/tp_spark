@@ -14,21 +14,22 @@ def main():
 
     output = "data/exo2/output"
 
-    # Création d'un DataFrame à partir d'un fichier CSV
     df_client = spark.read.csv(client_bdd, header=True, inferSchema=True)
     df_zipcode = spark.read.csv(city_zipcode, header=True, inferSchema=True)
 
+    clean_data = clean(df_client, df_zipcode)
+
+    wordwrite(clean_data, output)
+
+
+def clean(df_client, df_zipcode):
     df_client_major = df_client.where(f.col("age") >= 18)
     df_client_major.show()
 
     df_joinded = df_client.join(df_zipcode, df_client_major.zip == df_zipcode.zip).drop(df_zipcode.zip)
-    df_joinded.show()
-
     departement_udf = f.udf(lambda m: code_post_to_dep(m))
 
-    dd = df_joinded.withColumn("departement", departement_udf(f.col("zip")))
-
-    wordwrite(dd, output)
+    return df_joinded.withColumn("departement", departement_udf(f.col("zip")))
 
 
 def code_post_to_dep(code_postal):
@@ -41,4 +42,3 @@ def code_post_to_dep(code_postal):
 
 def wordwrite(df, dst):
     df.write.mode("overwrite").parquet(dst)
-

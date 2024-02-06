@@ -1,5 +1,6 @@
-import pyspark.sql.functions as f
 from pyspark.sql import SparkSession
+
+from src.fr.hymaia.exo1.spark_wordcount import wordcount, wordwrite
 
 
 def main():
@@ -16,13 +17,3 @@ def main():
 
     wordwrite(w, output)
 
-
-
-def wordcount(df, col_name):
-    return df.withColumn('word', f.explode(f.split(f.col(col_name), ' '))) \
-        .groupBy('word') \
-        .count()
-
-
-def wordwrite(df, dst):
-    df.write.mode("overwrite").partitionBy("count").parquet(dst)

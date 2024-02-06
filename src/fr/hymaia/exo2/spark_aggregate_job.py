@@ -12,10 +12,7 @@ def main():
     output = "data/exo2/output/aggregate.csv"
 
     df_client = spark.read.parquet(input, header=True, inferSchema=True)
-    df_client.show()
-
     df_dep_count = aggregate(df_client)
-    df_dep_count.show()
 
     aggregate_save(df_dep_count, output)
 
