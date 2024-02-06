@@ -1,7 +1,6 @@
 import pyspark.sql.functions as f
 from pyspark.sql import SparkSession
-
-
+from pyspark.sql.types import StringType
 
 
 def main():
@@ -25,14 +24,15 @@ def main():
     df_joinded = df_client.join(df_zipcode, df_client_major.zip == df_zipcode.zip).drop(df_zipcode.zip)
     df_joinded.show()
 
+    departement_udf = f.udf(lambda m: code_post_to_dep(m))
 
-    df_with_dep = df_joinded.withColumn("departement", code_post_to_dep(df_joinded["zip"]))
+    dd = df_joinded.withColumn("departement", departement_udf(f.col("zip")))
 
-    wordwrite(df_with_dep, output)
+    wordwrite(dd, output)
 
 
 def code_post_to_dep(code_postal):
-    dep = str(code_postal)[2:]
+    dep = str(code_postal)[:2]
     if dep == "20":
         dep = "2A" if int(str(code_postal)) <= 20190 else "2B"
 
